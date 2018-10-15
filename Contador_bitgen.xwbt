@@ -1,0 +1,8 @@
+INTSTYLE=ise
+INFILE=C:\FPGA\Contador_Cmod_S6_Fredyfrec\Contador.ncd
+OUTFILE=C:\FPGA\Contador_Cmod_S6_Fredyfrec\Contador.bit
+FAMILY=Spartan6
+PART=xc6slx4-3cpg196
+WORKINGDIR=C:\FPGA\Contador_Cmod_S6_Fredyfrec
+LICENSE=WebPack
+USER_INFO=211290443_0_0_439

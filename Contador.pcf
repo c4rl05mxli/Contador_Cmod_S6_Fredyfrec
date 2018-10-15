@@ -1,0 +1,26 @@
+//! **************************************************************************
+// Written by: Map P.20131013 on Sun Oct 14 15:41:01 2018
+//! **************************************************************************
+
+SCHEMATIC START;
+COMP "Pin1" LOCATE = SITE "P5" LEVEL 1;
+COMP "Pin2" LOCATE = SITE "N5" LEVEL 1;
+COMP "TG<0>" LOCATE = SITE "N6" LEVEL 1;
+COMP "TG<1>" LOCATE = SITE "P7" LEVEL 1;
+COMP "TG<2>" LOCATE = SITE "P12" LEVEL 1;
+COMP "TG<3>" LOCATE = SITE "N12" LEVEL 1;
+COMP "TG<4>" LOCATE = SITE "L14" LEVEL 1;
+COMP "TG<5>" LOCATE = SITE "L13" LEVEL 1;
+COMP "btn_reset" LOCATE = SITE "P9" LEVEL 1;
+COMP "uart_rx" LOCATE = SITE "A3" LEVEL 1;
+COMP "uart_tx" LOCATE = SITE "B3" LEVEL 1;
+COMP "Pulsos_A" LOCATE = SITE "F1" LEVEL 1;
+COMP "Pulsos_B" LOCATE = SITE "H1" LEVEL 1;
+COMP "clk_8Mhz" LOCATE = SITE "N8" LEVEL 1;
+COMP "led<0>" LOCATE = SITE "N3" LEVEL 1;
+COMP "led<1>" LOCATE = SITE "P3" LEVEL 1;
+COMP "led<2>" LOCATE = SITE "N4" LEVEL 1;
+COMP "led<3>" LOCATE = SITE "P4" LEVEL 1;
+COMP "CLK_1HZ" LOCATE = SITE "N7" LEVEL 1;
+SCHEMATIC END;
+

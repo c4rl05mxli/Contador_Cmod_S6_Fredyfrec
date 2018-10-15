@@ -1,0 +1,9 @@
+run
+-ifmt MIXED
+-top reloj_exdes
+-p xc6slx4-cpg196-3
+-ifn xst.prj
+-ofn reloj_exdes
+-keep_hierarchy soft 
+-equivalent_register_removal no 
+-max_fanout 65535

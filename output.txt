@@ -1,0 +1,10 @@
+Storage Target: Xilinx Flash/PROM
+Storage Family: Platform Flash
+FF
+14oct2018
+C:\FPGA\Contador_Cmod_S6_Fredyfrec/
+
+MCS
+r_Cmod_S6 - 1May2017/
+
+MCS

@@ -1,0 +1,17 @@
+PROMGEN: Xilinx Prom Generator P.20131013
+Copyright (c) 1995-2013 Xilinx, Inc.  All rights reserved.
+
+promgen -w -p mcs -c FF -o C:\FPGA\Contador_Cmod_S6_Fredyfrec\//14oct2018 -x xcf04s -u 00000000 C:/FPGA/Contador_Cmod_S6_Fredyfrec/contador.bit 
+
+PROM C:\FPGA\Contador_Cmod_S6_Fredyfrec\14oct2018.prm map: Sun Oct 14 15:44:05 2018
+
+Calculating PROM checksum with fill value ff
+
+Format        Mcs86 (32-bit)
+Size          512K
+PROM start    0000:0000
+PROM end      0007:ffff
+PROM checksum 02ee748b
+
+        Addr1        Addr2                     Date File(s)
+    0000:0000    0005:327b     Oct 14 15:41:36 2018 C:/FPGA/Contador_Cmod_S6_Fredyfrec/contador.bit

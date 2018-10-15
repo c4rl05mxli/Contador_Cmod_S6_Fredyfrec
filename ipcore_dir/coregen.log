@@ -1,0 +1,42 @@
+INFO:sim:172 - Generating IP...
+Resolving generics for 'reloj'...
+Applying external generics to 'reloj'...
+Delivering associated files for 'reloj'...
+WARNING:sim - Component clk_wiz_v3_6 does not have a valid model name for VHDL
+   synthesis
+Delivering EJava files for 'reloj'...
+Delivered 3 files into directory
+C:/FPGA/Contador_Cmod_S6/ipcore_dir/tmp/_cg/reloj
+Delivered 1 file into directory
+C:/FPGA/Contador_Cmod_S6/ipcore_dir/tmp/_cg/reloj
+Generating ASY schematic symbol...
+Loading device for application Rf_Device from file '6slx4.nph' in environment
+C:\Xilinx\14.7\ISE_DS\ISE\.
+INFO:sim:949 - Finished generation of ASY schematic symbol.
+Generating SYM schematic symbol for 'reloj'...
+Generating ISE project...
+XCO file found: reloj.xco
+XMDF file found: reloj_xmdf.tcl
+Adding C:/FPGA/Contador_Cmod_S6/ipcore_dir/tmp/_cg/reloj.asy -view all
+-origin_type imported
+Adding C:/FPGA/Contador_Cmod_S6/ipcore_dir/tmp/_cg/reloj.ucf -view all
+-origin_type created
+Adding C:/FPGA/Contador_Cmod_S6/ipcore_dir/tmp/_cg/reloj.vhd -view all
+-origin_type created
+INFO:HDLCompiler:1061 - Parsing VHDL file
+   "C:/FPGA/Contador_Cmod_S6/ipcore_dir/tmp/_cg/reloj.vhd" into library work
+INFO:ProjectMgmt - Parsing design hierarchy completed successfully.
+Adding C:/FPGA/Contador_Cmod_S6/ipcore_dir/tmp/_cg/reloj.vho -view all
+-origin_type imported
+INFO:TclTasksC:2116 - The automatic calculation of top has been turned-off.
+   Please set the new top explicitly by running the "project set top" command.
+   To re-calculate the new top automatically, set the "Auto Implementation Top"
+   property to true.
+Top level has been set to "/reloj"
+Generating README file...
+Generating FLIST file...
+INFO:sim:948 - Finished FLIST file generation.
+Launching README viewer...
+Moving files to output directory...
+Finished moving files to output directory
+Wrote CGP file for project 'reloj'.

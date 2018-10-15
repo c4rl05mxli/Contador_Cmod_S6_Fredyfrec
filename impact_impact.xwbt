@@ -1,0 +1,8 @@
+INTSTYLE=impact
+INFILE=C:\FPGA\Contador_Cmod_S6_Fredyfrec\impact.xsl
+OUTFILE=C:\FPGA\Contador_Cmod_S6_Fredyfrec\impact.xsl
+FAMILY=Single
+PART=Single
+WORKINGDIR=C:\FPGA\Contador_Cmod_S6_Fredyfrec
+LICENSE=iMPACT
+USER_INFO=iMPACT

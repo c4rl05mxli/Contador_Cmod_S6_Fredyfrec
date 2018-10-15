@@ -1,0 +1,991 @@
+				CONSTANT A_count0_port, 00          ;32-bit A-counter (LSByte first)
+				CONSTANT A_count1_port, 01
+				CONSTANT A_count2_port, 02
+				CONSTANT A_count3_port, 03
+
+				CONSTANT B_count0_port, 04          ;32-bit B-counter (LSByte first)
+				CONSTANT B_count1_port, 05
+				CONSTANT B_count2_port, 06
+				CONSTANT B_count3_port, 07
+
+				CONSTANT Timer1_F_0_port, 08          ;Timer1 32 bit, de la parte fraccionaria
+				CONSTANT Timer1_F_1_port, 09 
+				CONSTANT Timer1_F_2_port, 0A 
+				CONSTANT Timer1_F_3_port, 0B  
+
+				CONSTANT Timer1_E_0_port, 0C          ;Timer1 32 bit, de la parte Entera
+				CONSTANT Timer1_E_1_port, 0D 
+				CONSTANT Timer1_E_2_port, 0E 
+				CONSTANT Timer1_E_3_port, 0F
+
+				CONSTANT Timer2_F_0_port, 18          ;Timer2 32 bit, de la parte fraccionaria
+				CONSTANT Timer2_F_1_port, 19 
+				CONSTANT Timer2_F_2_port, 1A 
+				CONSTANT Timer2_F_3_port, 1B  
+
+				CONSTANT Timer2_E_0_port, 1C          ;Timer2 32 bit, de la parte Entera
+				CONSTANT Timer2_E_1_port, 1D 
+				CONSTANT Timer2_E_2_port, 1E 
+				CONSTANT Timer2_E_3_port, 1F
+
+				CONSTANT CTRL_status_port, 20		; control status port
+				CONSTANT start_button, 01				; bit start 
+				;Port definitions
+				;
+				CONSTANT UART_status_port, 40            ;UART status input, lo cambie a la 40
+				CONSTANT tx_half_full, 01                ;  Transmitter     half full - bit0
+				CONSTANT tx_full, 02                     ;    FIFO               full - bit1
+				CONSTANT rx_half_full, 04                ;  Receiver        half full - bit2
+				CONSTANT rx_full, 08                     ;    FIFO               full - bit3
+				CONSTANT rx_data_present, 10             ;               data present - bit4
+				;
+				CONSTANT UART_read_port, 80              ;UART Rx data input, lo cambie a 80, con el bit 7
+				;
+				
+				
+				; Definiciones de los puertos de Salida de Datos
+				CONSTANT UART_write_port, 80            ; port_id(0)='1';	UART Tx data output
+				CONSTANT Reset, 40						; port_id(1)='1'
+				CONSTANT Dato0,	04						; port_id(2)='1'
+				CONSTANT Dato1,	05						; port_id(3)='1'
+				CONSTANT Dato2, 06						; port_id(4)='1'
+				CONSTANT Dato3, 07						; port_id(5)='1'
+				CONSTANT Time0, 08						; port_id(5)='1'
+				CONSTANT Time1, 09						; port_id(5)='1'
+				CONSTANT Start, 02
+				
+				;CONSTANT PTL, 40						; port_id(6)='1'
+				;CONSTANT Dato3, 80						; port_id(7)='1'						
+				
+
+				;**************************************************************************************
+				;Scratch Pad Memory Locations 64 Bytes (00 to 3F)
+				;**************************************************************************************
+				;
+				CONSTANT count0, 00                 ;last 32-bit counter value (LSByte first)
+				CONSTANT count1, 01
+				CONSTANT count2, 02
+				CONSTANT count3, 03
+				;
+				CONSTANT MODO, 04					; Aqui guardo el modo de operacion
+				
+				CONSTANT COMANDO, 05				; Aqui guardo el comando, en lectura 3
+				
+				;BCD digits representing selected and displayed frequency
+			    ;
+			   CONSTANT BCD_digit0, 07             ; value           1
+			   CONSTANT BCD_digit1, 08             ;                10
+			   CONSTANT BCD_digit2, 09             ;               100
+			   CONSTANT BCD_digit3, 0A             ;             1,000
+			   CONSTANT BCD_digit4, 0B             ;            10,000
+			   CONSTANT BCD_digit5, 0C             ;           100,000
+			   CONSTANT BCD_digit6, 0D             ;         1,000,000
+			   CONSTANT BCD_digit7, 0E             ;        10,000,000
+			   CONSTANT BCD_digit8, 0F             ;       100,000,000
+
+					
+				CONSTANT decimal0, 10               ;10 digit decimal value up to 4,294,967,295
+				CONSTANT decimal1, 11
+				CONSTANT decimal2, 12
+				CONSTANT decimal3, 13
+				CONSTANT decimal4, 14
+				CONSTANT decimal5, 15
+				CONSTANT decimal6, 16
+				CONSTANT decimal7, 17
+				CONSTANT decimal8, 18
+				CONSTANT decimal9, 19
+				;
+				;Binary integer representation of BCD value
+				;
+				CONSTANT frequency0, 1A             ;LS byte
+				CONSTANT frequency1, 1B
+				CONSTANT frequency2, 1C
+				CONSTANT frequency3, 1D             ;MS byte
+				;
+				;
+				; UART character strings will be stored in scratch pad memory ending in carriage return.
+                ; A string can be up to 9 characters with the start location defined by this constant.
+                CONSTANT string_start, 20	
+				CONSTANT string_end,   28
+				; Location 30 to 3F are for registers s0 to sF
+				CONSTANT preserve_s0, 30           
+				CONSTANT preserve_s1, 31
+				CONSTANT preserve_s2, 32
+				CONSTANT preserve_s3, 33
+				CONSTANT preserve_s4, 34
+				CONSTANT preserve_s5, 35
+				CONSTANT preserve_s6, 36
+				CONSTANT preserve_s7, 37
+				CONSTANT preserve_s8, 38
+				CONSTANT preserve_s9, 39
+				CONSTANT preserve_sA, 3A
+				CONSTANT preserve_sB, 3B
+				CONSTANT preserve_sC, 3C
+				CONSTANT preserve_sD, 3D
+				CONSTANT preserve_sE, 3E
+				CONSTANT preserve_sF, 3F
+				;**************************************************************************************
+
+				;
+			
+				;ASCII table
+				;
+
+				CONSTANT STX, 02
+				CONSTANT ETX, 03
+
+				CONSTANT ENQ, 05
+				CONSTANT ACK, 06
+				CONSTANT NAQ, 15
+				
+				
+			
+				 
+				 
+;**************************************************************************************
+; Limpio Todas las posisiones de memoria, empiezo de 3F y termino en 00
+; utilizo registros s0, s1
+;**************************************************************************************				 
+
+		reset:	LOAD s1, 3F
+				LOAD s0, 00
+	 clear_spm: STORE s0, (s1)
+				SUB s1, 01
+				JUMP NC, clear_spm
+				
+	; clear_UART: INPUT s0, UART_status_port           ; limpio la UART despues de un reset.
+				; TEST s0, rx_data_present
+				; JUMP Z, clear_UART
+					
+				LOAD s0,00
+				OUTPUT s0,Reset						; pongo las salidas y entradas a cero
+					
+					
+				LOAD  s0,00	
+				STORE s0,MODO					; guardo en memoria el modo 0
+				STORE s0, COMANDO
+				
+espera_inicio:	CALL read_Command
+				FETCH s0, COMANDO
+				COMPARE s0, ENQ      ; no hago nada hasta recibir un 05 enq
+                JUMP Z, recibido
+				CALL Send_NAK
+				CALL espera_inicio
+				
+	recibido:   CALL disp_Idle		; si recibo el 05 contesto un 06 ack	
+
+				LOAD s0,00
+				OUTPUT s0,Reset						; pongo las salidas y entradas a cero
+				OUTPUT s0,Reset	
+				OUTPUT s0,Reset	
+				
+				
+		  		
+	restart:    ; inicio el sistema
+loop_principal:	; CALL main_menu
+				CALL read_Command
+				;CALL read_from_UART
+				FETCH s0, COMANDO				; pongo el caracter en s0
+				COMPARE s0, "A"     		; carriage return does nothing
+                JUMP Z, modo_pulsos
+                COMPARE s0, "B"              
+                JUMP Z, modo_Tiempo
+                COMPARE s0, "C"               
+                JUMP Z, modo_Libre
+				CALL Send_NAK				
+				CALL loop_principal
+				 
+				; ENABLE INTERRUPT
+				 
+         loop:	CALL delay_500ms
+last_reading:	; Lectura de los pulsos del Patron
+				INPUT s2, A_count0_port     ; Leo el contador A, Pulsos Patron
+                INPUT s3, A_count1_port
+                INPUT s4, A_count2_port
+				INPUT s5, A_count3_port
+				CALL integer_to_BCD  		; Esta funcion convierte los datos de los registros s2,s3,s4,s5
+                ; Transmision de los Datos
+				CALL Send_STX				; 0x02
+				LOAD sF,"P"					; 0x50  Pulsos del Patron
+				CALL send_to_UART			; Envio por UART
+ 			    CALL disp_digits			; Envia Cadena con los digitos                
+				CALL Send_ETX				; 0x03
+				;	
+				CALL delay_20ms
+				; Lectura de los pulsos del Patron 
+				INPUT s2, B_count0_port     ; Leo el contador B, Pulsos bajo prueba
+                INPUT s3, B_count1_port
+                INPUT s4, B_count2_port
+				INPUT s5, B_count3_port
+				CALL integer_to_BCD  		; Esta funcion convierte los datos de los registros s2,s3,s4,s5
+                ; Transmision de los Datos
+				CALL Send_STX				; 0x02
+				LOAD sF,"p"					; 0x70  Pulsos del Patron
+				CALL send_to_UART			; Envio por UART
+ 			    CALL disp_digits			; Envia Cadena con los digitos                
+				CALL Send_ETX				; 0x03
+				;
+				CALL delay_20ms
+				; Lectura de Tiempo del Patron 
+				INPUT s2, Timer1_E_0_port   ; Leo la parte entera del timer 1
+                INPUT s3, Timer1_E_1_port
+                INPUT s4, Timer1_E_2_port
+				INPUT s5, Timer1_E_3_port
+				CALL integer_to_BCD  		; Esta funcion convierte los datos de los registros s2,s3,s4,s5
+				; Transmision de los Datos
+				CALL Send_STX				; 0x02
+				LOAD sF, "T"
+				CALL send_to_UART
+				CALL disp_digits			; muestra los digitos convertidos
+				LOAD sF, "."				; escribo un punto
+			 	CALL send_to_UART
+				INPUT s2, Timer1_F_0_port   ; Leo la parte fraccionaria del timer 2
+                INPUT s3, Timer1_F_1_port
+                INPUT s4, Timer1_F_2_port
+				INPUT s5, Timer1_F_3_port
+				CALL integer_to_BCD  		; Esta funcion convierte los datos de los registros s2,s3,s4,s5
+				CALL disp_digits_timer		; muestra los digitos convertidos
+				CALL Send_ETX				; 0x03
+				;
+				CALL delay_20ms
+				; Lectura de Tiempo bajo prueba
+				INPUT s2, Timer2_E_0_port  ; Leo la parte entera del timer 2
+                INPUT s3, Timer2_E_1_port
+                INPUT s4, Timer2_E_2_port
+				INPUT s5, Timer2_E_3_port
+				CALL integer_to_BCD  		; Esta funcion convierte los datos de los registros s2,s3,s4,s5
+				; Transmision de los Datos
+				CALL Send_STX				; 0x02
+				LOAD sF, "t"
+				CALL send_to_UART
+				CALL disp_digits			; muestra los digitos convertidos
+				LOAD sF, "."				; escribo un punto
+			 	CALL send_to_UART
+				INPUT s2, Timer2_F_0_port   ; Leo la parte fraccionaria del timer 2
+                INPUT s3, Timer2_F_1_port
+                INPUT s4, Timer2_F_2_port
+				INPUT s5, Timer2_F_3_port
+				CALL integer_to_BCD  		; Esta funcion convierte los datos de los registros s2,s3,s4,s5
+				CALL disp_digits_timer		; muestra los digitos convertidos
+				CALL Send_ETX				; 0x03
+				CALL delay_20ms
+				;
+				;
+				;CALL Send_CRLF
+				;
+				;
+				INPUT s0, CTRL_status_port	; test bit 1 control
+				TEST s0, 02
+				JUMP C, loop
+				
+				
+			
+				CALL disp_finish			; 0x02 'f' 0x03
+fin:			;NOP 
+				CALL read_Command
+				;CALL read_from_UART
+				FETCH s0, COMANDO				; pongo el caracter en s0
+				COMPARE s0, "D"             ; Si presiono la tecla D, es el Enter
+				JUMP Z, recibido
+				COMPARE s0, "L" 
+			    JUMP Z,last_reading
+				CALL Send_NAK
+				JUMP fin
+					
+				JUMP loop
+
+				
+prompt_input:   ;CALL send_prompt                         ;Prompt 'KCPSM3>'
+                CALL receive_string      
+	
+
+read_Command:	CALL read_from_UART      	; Lee el caracter 1 de la uart
+				COMPARE sF, 02          	; Verifico que sea un STX
+				JUMP NZ, bad_command
+				CALL read_from_UART			; Lee el caracter 2 de la uart
+				STORE sF, COMANDO			; lo guardo en la memoria
+				CALL read_from_UART      	; Lee el caracter de la uart
+				COMPARE sF, 03          	; Verifico que tengo un STX
+				JUMP NZ, bad_command
+				RETURN
+
+bad_command:	LOAD s0,FF
+				STORE s0,COMANDO
+				CALL clear_UART_Rx_loop
+				RETURN
+;**************************************************************************************
+;***	Lee un caracter por la UART
+;***	usa los registros s0 y sF
+;**************************************************************************************
+				;
+read_from_UART: INPUT s0, UART_status_port   	; test Rx_FIFO buffer
+				TEST s0, rx_data_present
+				JUMP NZ, read_character
+				JUMP read_from_UART
+read_character: INPUT sF, UART_read_port  		; read from FIFO
+				RETURN
+				;
+;**************************************************************************************
+;***	Transmite un caracter por la UART
+;***	usa los registros s0 y sF
+;**************************************************************************************
+				;
+send_to_UART: 	INPUT s0, UART_status_port      ; verifico si hay especio en buffer
+				TEST s0, tx_full
+				JUMP Z, UART_write				; si hay espacio transmito	
+				JUMP send_to_UART				; si no hay espacio espero
+UART_write: 	OUTPUT sF, UART_write_port
+				RETURN
+				;
+;**************************************************************************************
+;***	Transmite Cadena envia loa valores almacenados en las 9 posisiones de memoria
+;***	usa los registros sE y sF
+;**************************************************************************************
+;transmit_string:	LOAD sE, string_start     		; Carga en sE, el valor 0x20, posición del MSD      
+; next_char_tx: 	FETCH sF, (sE)                 ; cargo el sF, la posicion de memoria apuntada por sE
+					; CALL send_to_UART              ; envio el valor de sF por la UART  
+					; COMPARE sE, string_end         ; comparo con el final de la cadena = 0x28
+					; RETURN Z
+					; ADD sE, 01                       
+					; JUMP next_char_tx
+;**************************************************************************************
+;	
+;**************************************************************************************
+;***	Transmite Cadena envia loa valores almacenados en las 9 posisiones de memoria
+;***	usa los registros sE y sF (sD modo de operacion)
+;**************************************************************************************
+transmit_string:	FETCH sD, MODO
+					LOAD sE, string_start     		; Carga en sE, el valor 0x20, posición del MSD      
+next_char_tx: 		FETCH sF, (sE)                 ; cargo el sF, la posicion de memoria apuntada por sE
+					CALL send_to_UART              ; envio el valor de sF por la UART  
+					COMPARE sE, string_end         ; comparo con el final de la cadena = 0x28
+					RETURN Z
+					ADD sE, 01 
+					COMPARE sE,23					; pone el punto en el caracter 23
+					JUMP NZ	, next_char_tx
+					COMPARE sD,02
+					JUMP NZ	, next_char_tx			; si estoy en el modo 2 pongo el punto
+					LOAD sF, "." 
+					CALL send_to_UART
+					JUMP next_char_tx
+;**************************************************************************************
+
+
+
+
+
+
+
+
+
+
+
+
+
+		
+;				
+;**************************************************************************************
+;***	Transmite Cadena envia loa valores almacenados en las 9 posisiones de memoria
+;***	usa los registros sE y sF
+;**************************************************************************************
+transmit_spaces:	;LOAD s5, 44          		 ; Linea 4 posision 5
+					;CALL LCD_cursor
+					LOAD sE, 00    				; Carga en sE, el valor 0x20, posición del MSD      
+next_space: 		LOAD sF, " "    ; cargo el sF, la posicion de memoria apuntada por sE
+					CALL send_to_UART         ; envio el valor de sF por la UART  
+					COMPARE sE, 20        ; comparo con el final de la cadena = 0x28
+					RETURN Z
+					ADD sE, 01                       
+					JUMP next_space
+;**************************************************************************************
+					
+					
+;**************************************************************************************
+;***		Función para leer datos desde el teclado y genera string de datos		***
+;***		Utiliza las constantes string_start y string_end						***
+;***		Registros usados s0, sF													***
+;**************************************************************************************					
+					;
+ receive_string: 	;CALL Fill_zeros
+receive_full_test: 	;CALL transmit_spaces
+					;LOAD s5, 43           ; Linea 4 posision 4
+					;CALL LCD_cursor
+					;CALL transmit_string
+ 					;
+					INPUT s0, UART_status_port        ;verifico si Buffer UART esta lleno
+					TEST s0, rx_full
+					JUMP NZ, clear_UART_Rx_loop
+					CALL read_from_UART      	; Lee el caracter de la uart
+					;								
+					COMPARE sF, 03          	; Si presiono la tecla ETX, es el Enter
+					JUMP Z, check_zeros
+					COMPARE sF, 02          	; Verifico que tengo un STX
+					JUMP Z, clear_all
+					; COMPARE sF, character_B          ; La tecla B, va a ser un Backspace, 
+					; JUMP Z, Backspace
+					; COMPARE sF, character_A          ; La tecla A, ve al menu principal, 
+					; JUMP Z, menu_arriba
+					;****** Verifico que solo sean caracteres entre 0 y 9 ********************
+					LOAD s0 , sF
+					ADD s0, C6                      ; reject character codes above '9' (39 hex)
+					JUMP C, receive_full_test		; carry flag is set
+					SUB s0, F6                      ; reject character codes below '0' (30 hex)
+					JUMP C, receive_full_test		; si no hay acarreo el dato esta entre 0 y 9
+					;***************************************************************************
+					CALL move_left
+					STORE sF, string_end     		; Guardo siempre en la ultima posicion
+					JUMP receive_full_test	        ; despues regreso a solicitar otro dato
+					;
+					;
+		clear_all: 	CALL Fill_zeros
+					JUMP receive_full_test
+					
+		; Backspace:	CALL move_right
+					; JUMP receive_full_test
+					
+					
+	; menu_arriba:	CALL clear_UART_Rx_loop
+					; JUMP main_menu		
+					
+					
+check_zeros:	LOAD s0, string_end
+check_loop: 	FETCH s1,(s0)
+                COMPARE s1,"0"
+                RETURN NZ
+                COMPARE s0, string_start
+                JUMP Z,receive_full_test
+                SUB s0,01
+                JUMP check_loop
+			
+					
+					
+					
+clear_UART_Rx_loop: INPUT s0, UART_status_port           ;test Rx_FIFO buffer for data
+					TEST s0, rx_data_present
+					RETURN Z                              ;finish when buffer is empty
+					INPUT sF, UART_read_port          ;read from FIFO and ignore
+					JUMP clear_UART_Rx_loop
+                    ;
+;**************************************************************************************			   
+		   
+	
+;**************************************************************************************
+;***		Función para mover string a la izquierda								***
+;***		Utiliza las constantes string_start y string_end						***
+;***		Registros usados s0, s1 y s2											***
+;**************************************************************************************
+					;
+	move_left:  	LOAD s0, string_start
+    ml_loop:    	LOAD s1, s0
+                    ADD s1,01
+                    FETCH s2,(s1)
+                    STORE s2,(s0)
+                    COMPARE s1,string_end
+                    RETURN Z
+                    ADD s0,01
+                    JUMP ml_loop 
+					;
+;**************************************************************************************
+   
+;**************************************************************************************
+;***		Función para mover string a la izquierda								***
+;***		Utiliza las constantes string_start y string_end						***
+;***		Registros usados s0, s1 y s2											***
+;**************************************************************************************
+					;   
+     move_right:  	LOAD s0, string_end
+        mr_loop:    LOAD s1, s0
+                    SUB s1,01
+                    FETCH s2,(s1)
+                    STORE s2,(s0)
+                    SUB s0,01
+                    COMPARE s1,string_start
+                    JUMP Z, move_zero
+                    JUMP mr_loop
+        move_zero:  LOAD s2, "0"
+                    STORE s2,(s0)
+                    RETURN
+					;
+;**************************************************************************************
+   		   
+		   
+;**************************************************************************************
+;***		Función para llenar string de datos										***
+;***		Utiliza las constantes string_start y string_end						***
+;***		Registros usados s0 y s1												***
+;**************************************************************************************
+					;
+	Fill_zeros: 	LOAD s0, "0"
+	Fill_s0:  		LOAD s1, string_start		; Usa el valor de s0
+	Fill:			STORE s0, (s1)
+					COMPARE s1,string_end
+					RETURN Z
+					ADD s1,01
+					JUMP Fill
+					;
+;**************************************************************************************
+				
+				
+;**************************************************************************************
+;***		Función para convertir string de ASCII a BCD							***
+;***		Constantes Usadas:	string_start, string_end y BCD_digit0				***
+;***		Registros Usados: 	s0, s1 y s2											***
+;**************************************************************************************
+					;
+	ascii_to_bcd:	LOAD s0, string_end			; string_end
+					LOAD s1, BCD_digit0			; BCD_digit0 
+	ascii_loop:     FETCH s2, (s0)				; Leo de la Memoria
+					AND   s2, 0F				; Obtengo el nibble Bajo
+					STORE s2,(s1)				; Escribo en la Memoria
+					COMPARE s0,string_start	; Comparo con el Ultimo Caracter
+					RETURN Z					; Regreso si es Cero
+					SUB s0, 01					; Redusco el puntero de String
+					ADD s1,01					; Aumento el puntero de BCD
+					JUMP ascii_loop				; 
+					;
+;**************************************************************************************				
+
+;**************************************************************************************
+;***		Funcion para convertir entero de 32-bit a BCD							***
+;***		Constantes Usadas: decimal0												***
+;***		Registros Usados: s0,s2,s3,s4,s5,s6,s7,s8,s9,sA,sB,sC,sD,sE,sF			***
+;***		Registros de Entrada:	[s5,s4,s3,s2]									***
+;***							MSByte	  		LSByte								***
+;**************************************************************************************
+					;
+	integer_to_BCD: LOAD sE, 0A                 ;10 digits to be formed from value up to 4294967295
+					LOAD sF, decimal0           ;pointer for LS-Digit
+   int_to_BCD_loop: CALL divide_32bit_by_10
+					STORE s1, (sF)              ;remainder becomes digit value
+					ADD sF, 01                  ;move to next most significant digit
+					SUB sE, 01                  ;one less digit to compute
+					JUMP NZ, int_to_BCD_loop
+					RETURN
+					;
+;Divide 32-bit binary integer by 10
+;
+;The value to be divided is held in register set [s5,s4,s3,s2]
+;and this is where the result is returned to.
+;
+;At then end of the integer division the remainder in the range 0 to 9
+;will be in register s1.
+;
+;Registers used s0, s2,s3,s4,s5,s6,s7,s8,s9,sA,sB,sC,sD
+					;
+divide_32bit_by_10: LOAD sA, s2                         ;copy input value to set [sD,sC,sB,sA]
+					LOAD sB, s3
+					LOAD sC, s4
+					LOAD sD, s5
+					LOAD s2, 00                         ;clear result
+					LOAD s3, 00
+					LOAD s4, 00
+					LOAD s5, 00
+					LOAD s9, A0                         ;initialise '10' value into msb's of set [s9,s8,s7,s6]
+					LOAD s8, 00
+					LOAD s7, 00
+					LOAD s6, 00
+					LOAD s0, 1D                         ;29 subtract and shift iterations to be performed
+		div10_loop: SUB sA, s6                          ;perform 32-bit subtract [sD,sC,sB,sA]-[s9,s8,s7,s6]
+					SUBCY sB, s7
+					SUBCY sC, s8
+					SUBCY sD, s9
+					JUMP C, div10_restore
+					SL1 s2                              ;shift '1' into result
+					JUMP div10_shifts
+	 div10_restore: ADD sA, s6                          ;perform 32-bit addition [sD,sC,sB,sA]+[s9,s8,s7,s6]
+					ADDCY sB, s7
+					ADDCY sC, s8
+					ADDCY sD, s9
+					SL0 s2                              ;shift '0' into result
+	  div10_shifts: SLA s3                              ;complete 32-bit shift left
+					SLA s4
+					SLA s5
+					SR0 s9                              ;divide '10' value by 2 (shift right 1 place)
+					SRA s8
+					SRA s7
+					SRA s6
+					SUB s0, 01                          ;count iterations
+					JUMP NZ, div10_loop
+					LOAD s1, sA                         ;remainder of division
+					RETURN
+;**************************************************************************************
+				
+
+
+;
+;
+;
+;**************************************************************************************
+; Convert 9 digit BCD frequency into 32-bit binary integer
+;**************************************************************************************
+;
+;	Both values are stored in scratch pad memory
+;    BCD values in ascending locations BCD_digit0 to BCD_digit8
+;    Binary frequency in ascending locations frequency0 to frequency3
+;
+;Each digit is read in turn and its value is determined by repeated
+;decrement until reaching zero. Each decrement causes a value to be added
+;to the memory locations forming the frequency value as binary integer.
+;The process requires approximately 1600 instructions to convert the highest
+;value 999,999,999 which is approximately 64us at 50MHz clock rate.
+;
+;Registers used s0,s1,s2,s3,s4,s5,s6,s7,s8,s9,sA,sB
+;
+	BCD_to_integer: LOAD s2, 09                         ;9 digits to convert
+					LOAD s0, 00                         ;clear frequency value ready to accumulate result
+					STORE s0, frequency0
+					STORE s0, frequency1
+					STORE s0, frequency2
+					STORE s0, frequency3
+					LOAD sB, 00                         ;initialise BCD digit weighting [sB,sA,s9,s8] to 1
+					LOAD sA, 00
+					LOAD s9, 00
+					LOAD s8, 01
+					LOAD s3, BCD_digit0                 ;locate LS-digit
+next_BCD_to_int_digit: FETCH s1, (s3)
+BCD_digit_convert: COMPARE s1, 00                      ;test for zero
+					JUMP Z, next_digit_value
+					FETCH s0, frequency0                ;add 32-bit digit weighting to memory value
+					ADD s0, s8
+					STORE s0, frequency0
+					FETCH s0, frequency1
+					ADDCY s0, s9
+					STORE s0, frequency1
+					FETCH s0, frequency2
+					ADDCY s0, sA
+					STORE s0, frequency2
+					FETCH s0, frequency3
+					ADDCY s0, sB
+					STORE s0, frequency3
+					SUB s1, 01                          ;decrement digit value
+					JUMP BCD_digit_convert
+					;Increase weighting by 10x
+next_digit_value:   LOAD s7, sB                         ;copy existing weighting
+					LOAD s6, sA
+					LOAD s5, s9
+					LOAD s4, s8
+					SL0 s8                              ;multiply weight by 4x (shift left 2 places)
+					SLA s9
+					SLA sA
+					SLA sB
+					SL0 s8
+					SLA s9
+					SLA sA
+					SLA sB
+					ADD s8, s4                          ;add previous weight to form 5x multiplication
+					ADDCY s9, s5
+					ADDCY sA, s6
+					ADDCY sB, s7
+					SL0 s8                              ;multiply weight by 2x (shift left 1 places)
+					SLA s9
+					SLA sA
+					SLA sB                              ;weight value is now 10x previous value
+					ADD s3, 01                          ;move to next digit for conversion
+					SUB s2, 01
+					JUMP NZ, next_BCD_to_int_digit
+					RETURN
+					;
+;**************************************************************************************
+;***		Función para convertir enviar digitos decimales por la UART				***
+;***		Constantes Usadas:	decimal9 a decimal0									***
+;***		Registros Usados: 	sE, UART(s0 y sF)									***
+;**************************************************************************************	
+					;
+disp_digits_timer:  FETCH sF, decimal7                  ; 100mS
+                    CALL disp_digit_timer
+                    FETCH sF, decimal6                  ; 10mS
+                    CALL disp_digit_timer
+                    FETCH sF, decimal5                  ; 1mS
+                    CALL disp_digit_timer
+                    FETCH sF, decimal4                  ; 100us
+                    CALL disp_digit_timer
+                    FETCH sF, decimal3                  ; 10uS
+                    CALL disp_digit_timer
+					FETCH sF, decimal2                 	; 1us
+                    CALL disp_digit_timer
+                    ;FETCH sF, decimal1         			; 100nS
+                    ;CALL disp_digit_timer
+                    ;FETCH sF, decimal0  				; 10nS
+					;CALL disp_digit_timer
+                    RETURN
+					;
+disp_digit_timer:   ADD sF, "0"                 ;convierto el numero a ASCII
+                    CALL send_to_UART
+                    RETURN	  
+					;
+;**************************************************************************************
+;***		Función para convertir y enviar digitos por la UART						***
+;***		Constantes Usadas:	decimal9 a decimal0									***
+;***		Registros Usados: 	sE, UART(s0 y sF)									***
+;**************************************************************************************					  	
+					;
+disp_digits: 		LOAD sE, FF                         ;bandera de caracter nulo       	  
+					FETCH sF, decimal9                  ;
+					CALL zero_test
+					CALL disp_digit
+					FETCH sF, decimal8                  ;
+					CALL zero_test
+					CALL disp_digit
+					FETCH sF, decimal7                  ;
+					CALL zero_test
+					CALL disp_digit
+					FETCH sF, decimal6                  ;
+					CALL zero_test
+					CALL disp_digit
+					FETCH sF, decimal5                  ;
+					CALL zero_test
+					CALL disp_digit
+					FETCH sF, decimal4                  ;
+					CALL zero_test
+					CALL disp_digit
+					FETCH sF, decimal3                  ;
+					CALL zero_test
+					CALL disp_digit
+					FETCH sF, decimal2                  ;
+					CALL zero_test
+					CALL disp_digit
+					FETCH sF, decimal1                  ;
+					CALL zero_test
+					CALL disp_digit
+					FETCH sF, decimal0  				   ;
+					ADD sF, "0"                 ;
+					CALL send_to_UART
+					RETURN
+					;
+        zero_test:  COMPARE sF, 00		; compara para ver si es cero
+                    RETURN Z
+                    LOAD sE, 00			; si es cero cambio la bandera
+					RETURN
+                    ;
+        disp_digit: COMPARE sE, FF
+                    JUMP Z, blank_digit
+                    ADD sF, "0"                 ;
+                    CALL send_to_UART
+                    RETURN
+        blank_digit:;LOAD sF, " "
+                    ;CALL send_to_UART
+                    RETURN
+;**************************************************************************************	
+			  
+					  
+					  
+					  
+					  
+					  
+					  
+					  
+;**************************************************************************************
+;	Mensajes enviados por la UART
+; 	Registros: sF
+;**************************************************************************************
+				;
+Send_STX:		LOAD sF, 02			; STX
+				CALL send_to_UART
+				RETURN
+				;
+Send_ETX:		LOAD sF, 03			; ETX
+				CALL send_to_UART
+				RETURN
+				;
+Send_CRLF:		LOAD sF, 0D			; CR
+				CALL send_to_UART
+				LOAD sF, 0A			; LF
+				CALL send_to_UART
+				RETURN				
+				;
+Send_ACK:		CALL Send_STX
+				LOAD sF, 05			; ACK
+				CALL send_to_UART
+				CALL Send_ETX
+				RETURN	
+				;
+Send_NAK:		CALL Send_STX
+				LOAD sF, 15			; NAK
+				CALL send_to_UART
+				CALL Send_ETX
+				RETURN	
+				;				
+disp_Idle:		CALL Send_STX
+				LOAD sF, "i" 
+				CALL send_to_UART 	; 'i'
+				CALL Send_ETX
+				RETURN		
+				
+disp_Ready:		CALL Send_STX
+				LOAD sF, "r" 
+				CALL send_to_UART 	; 'r'
+				CALL Send_ETX
+				RETURN					
+				
+				
+disp_Start:		OUTPUT sF, Start
+				CALL Send_STX
+				LOAD sF, "s" 
+				CALL send_to_UART 	; 's'
+				CALL Send_ETX
+				RETURN						
+				;
+disp_wait:		CALL Send_STX
+				LOAD sF, "w" 
+				CALL send_to_UART 	; 'w'
+				CALL Send_ETX
+				RETURN		
+				;
+disp_finish:	CALL Send_STX
+				LOAD sF, "f" 
+				CALL send_to_UART 	; 'f'
+				CALL Send_ETX
+				RETURN	
+;**************************************************************************************				
+				
+read_from_CTRL: INPUT s0, CTRL_status_port               	;test bit 0 control
+				TEST s0, 01
+				JUMP Z, read_from_CTRL
+				RETURN
+				
+				
+busy_CTRL: 		INPUT s0, CTRL_status_port               	;test bit 1 control
+				TEST s0, 01
+				JUMP Z, busy_exit
+				TEST s0, 02
+				JUMP NC, busy_CTRL
+busy_exit:		RETURN				
+				
+				
+ modo_pulsos:   CALL disp_Ready
+
+				LOAD s0,01					
+				STORE s0,MODO				; el modo uno es para conteo por pulsos, no hay punto en el string
+						
+				CALL receive_string
+				CALL ascii_to_bcd		;
+				CALL BCD_to_integer
+				;
+				FETCH s0, frequency0 		; Cargo el valor binario menos significativo
+				OUTPUT s0, Dato0 			; Lo saco por el puerto en la posicion predefinida
+				FETCH s0, frequency1 		; Cargo el valor binario menos significativo
+				OUTPUT s0, Dato1 			; Lo saco por el puerto en la posicion predefinida
+				FETCH s0, frequency2 		; Cargo el valor binario menos significativo
+				OUTPUT s0, Dato2 			; Lo saco por el puerto en la posicion predefinida
+				FETCH s0, frequency3 		; Cargo el valor binario menos significativo
+				OUTPUT s0, Dato3 			; Lo saco por el puerto en la posicion predefinida
+				LOAD s0,FF					; Modo Pulsos 01
+				OUTPUT s0, Time0			; En la puerta 40, bit 6				
+				OUTPUT s0, Time1
+				
+				
+				LOAD s0,00
+				OUTPUT s0,Reset
+				
+				; LOAD sF,ACK				; enviar ack
+				; CALL send_to_UART
+				
+				CALL disp_Start			
+				CALL read_from_CTRL
+				CALL disp_wait
+				CALL busy_CTRL		; wait until busy			
+				JUMP loop
+				RETURN
+				;
+				;
+modo_Tiempo:    CALL disp_Ready
+
+				LOAD s0,01
+				STORE s0,MODO			; Pongo el sistema en modo 2 - Limite de tiempo
+				;
+				CALL receive_string
+				CALL ascii_to_bcd		;
+				CALL BCD_to_integer
+				;
+				FETCH s0, frequency0 	; Cargo el valor binario menos significativo
+				OUTPUT s0, Time0 		; Lo saco por el puerto en la posicion predefinida
+				FETCH s0, frequency1 	; Cargo el valor binario menos significativo
+				OUTPUT s0, Time1 		; Lo saco por el puerto en la posicion predefinida
+				; FETCH s0, frequency2 	; Cargo el valor binario menos significativo
+				; OUTPUT s0, Dato2 		; Lo saco por el puerto en la posicion predefinida
+				; FETCH s0, frequency3 	; Cargo el valor binario menos significativo
+				; OUTPUT s0, Dato3 		; Lo saco por el puerto en la posicion predefinida
+				; LOAD s0,00				; Modo Tiempo 00
+				; OUTPUT s0, PTL			; En la puerta 40, bit 6
+				
+				LOAD s0,FF
+				OUTPUT s0, Dato0 			; Lo saco por el puerto en la posicion predefinida
+				OUTPUT s0, Dato1 			; Lo saco por el puerto en la posicion predefinida
+				OUTPUT s0, Dato2 			; Lo saco por el puerto en la posicion predefinida
+				OUTPUT s0, Dato3 			; Lo saco por el puerto en la posicion predefinida
+				
+				
+				
+				LOAD s0,00
+				OUTPUT s0,Reset
+				
+				
+				; LOAD sF, ACK				; enviar ack
+				; CALL send_to_UART
+
+				CALL disp_Start
+				CALL read_from_CTRL
+				
+				CALL disp_wait
+				CALL busy_CTRL			; wait until busy
+				JUMP loop
+				RETURN				 
+				;
+				;
+modo_Libre:     CALL disp_Ready
+				
+				LOAD s0,03
+				STORE s0,MODO			; Pongo el sistema en modo 3 - modo libre
+
+				; CALL delay_1s
+				;LOAD s0,02				; Modo Libre
+				;OUTPUT s0, PTL			; En la puerta 40, bit 6			
+				
+				LOAD s0,FF
+				OUTPUT s0, Dato0 			; Lo saco por el puerto en la posicion predefinida
+				OUTPUT s0, Dato1 			; Lo saco por el puerto en la posicion predefinida
+				OUTPUT s0, Dato2 			; Lo saco por el puerto en la posicion predefinida
+				OUTPUT s0, Dato3 			; Lo saco por el puerto en la posicion predefinida
+				
+				OUTPUT s0, Time0			; En la puerta 40, bit 6				
+				OUTPUT s0, Time1
+				
+				
+				LOAD s0,00
+				OUTPUT s0, Reset
+				
+				CALL disp_Start			
+				CALL read_from_CTRL
+				
+				CALL disp_wait			
+				CALL busy_CTRL			; wait until busy				
+				JUMP loop	
+				RETURN				 
+				;
+				;
+
+
+				
+				
+				
+				
+				; Software Delays
+				; ---------------
+				;
+				INCLUDE "soft_delays_100mhz.psm"
+				;	
+				;
+				;
+				;**************************************************************************************
+				;
+				;**************************************************************************************
+				;Interrupt Service Routine
+				;**************************************************************************************
+				;
+				;**************************************************************************************
+				;Interrupt Vector
+				;**************************************************************************************
+				;
+				; ADDRESS 3FF
+				; JUMP ISR
+				 
